@@ -8,13 +8,18 @@ namespace EXQuiz
 {
     internal class Testee : User
     {
-        private string name;
-        private DateOnly birthDay;
+        public string name;
+        public DateOnly birthDay;
 
         public Testee(string login, string password, string name, DateOnly birthDay) : base(login, password)
         {
             this.name = name;
             this.birthDay = birthDay;
+        }
+
+        public override string ToString()
+        {
+            return name;
         }
     }
 }

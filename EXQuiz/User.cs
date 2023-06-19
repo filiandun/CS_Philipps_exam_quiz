@@ -8,9 +8,8 @@ namespace EXQuiz
 {
     internal abstract class User
     {
-        private string login;
-        private string password;
-
+        public string login;
+        public string password;
 
         public User(string login, string password)
         {
