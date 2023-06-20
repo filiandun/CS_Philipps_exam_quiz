@@ -11,6 +11,8 @@ namespace EXQuiz
         public string login;
         public string password;
 
+        public string pathToMainFile;
+
         public User(string login, string password)
         {
             this.login = login;

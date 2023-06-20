@@ -8,19 +8,23 @@ namespace EXQuiz
         StreamReader streamReader;
         StreamWriter streamWriter;
 
-        private string path;
+        private string pathToSDMQ;
+        private string pathToQuizzes;
+        private string pathToUsers;
 
         User user;
 
-
         public Quiz(string path)
         {
-            this.path = path;
-            if (!Directory.Exists(this.path)) // если пути не существует (т.е. программа в первый раз открывается)
+            this.pathToSDMQ = path; // основная директория
+            this.pathToUsers = path + @"Users\"; // директория с пользователями
+            this.pathToQuizzes = path + @"Quizzes\"; // директория с викторинами
+
+            if (!Directory.Exists(this.pathToSDMQ)) // если пути не существует (т.е. программа в первый раз открывается)
             {
-                Directory.CreateDirectory(this.path); // создание основной директории
-                Directory.CreateDirectory(this.path + "Quizzes"); // создание директории с тестами
-                Directory.CreateDirectory(this.path + "Users"); // создание директории с пользователями
+                Directory.CreateDirectory(this.pathToSDMQ); // создание основной директории
+                Directory.CreateDirectory(this.pathToQuizzes); // создание директории с викторинами
+                Directory.CreateDirectory(this.pathToUsers); // создание директории с пользователями
 
                 Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("ЗДРАВСТВУЙТЕ, ВЫ БЕРЁТЕ НА СЕБЯ РОЛЬ АДМИНИСТРАТОРА"); Console.ResetColor();
                 Console.WriteLine("Ваш логин задан автоматически: admin");
@@ -32,13 +36,13 @@ namespace EXQuiz
 
 
 
-
         private void WriteToFile(string login, string password, string name = null, DateOnly birthDay = new DateOnly())
         {
-            Directory.CreateDirectory(this.path + @"Users\" + login); // создание директории с пользователем
-            Directory.CreateDirectory(this.path + @"Users\" + login + "QuizzesResults"); // создание директории с результатами тестов
-            this.streamWriter = new StreamWriter(this.path + @"Users\" + login + @"\" + login + ".txt"); // открытие потока для записи       
+            Directory.CreateDirectory(this.pathToUsers + login); // создание директории с пользователем
+            Directory.CreateDirectory(this.pathToUsers + login + @"\QuizzesResults"); // создание директории с результатами тестов
 
+            this.streamWriter = new StreamWriter(this.pathToUsers + login + @"\" + login + ".txt"); // открытие потока для записи
+            // 
             this.streamWriter.WriteLine(login); // запись логина
             this.streamWriter.Write(password); // запись пароля
 
@@ -59,9 +63,9 @@ namespace EXQuiz
 
         private void ReadFromFile(string login)
         {
-            this.streamReader = new StreamReader(this.path + @"Users\" + login + @"\" + login + ".txt"); // открытие потока для чтения
+            this.streamReader = new StreamReader(this.pathToUsers + login + @"\" + login + ".txt"); // открытие потока для чтения
 
-            string buf = this.streamReader.ReadLine();
+            this.streamReader.ReadLine(); // считывание в пустоту
             string password = this.streamReader.ReadLine();
 
             if (login != "admin") // повторюсь, у админа нет имени и дня рождения, поэтому нужна проверка
@@ -86,18 +90,16 @@ namespace EXQuiz
         {
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[ВХОД В СУЩЕСТВУЮЩИЙ АККАУНТ]"); Console.ResetColor();
 
-            //
-            Console.Write("введите ваш логин: "); string login = Console.ReadLine();
+            Console.Write("\nВведите ваш логин: "); string login = Console.ReadLine();
             while (!this.isLoginExist(login))
             {
-                Console.ForegroundColor = ConsoleColor.Red; Console.Write("введённый логин не существует, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый логин не существует, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
             }
 
-            //
-            Console.Write("введите ваш пароль: "); string password = Console.ReadLine();
+            Console.Write("Введите ваш пароль: "); string password = Console.ReadLine();
             while (!this.isPasswordCorrect(login, password))
             {
-                Console.ForegroundColor = ConsoleColor.Red; Console.Write("введённый пароль неверный, попробуйте ещё раз: "); Console.ResetColor(); password = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый пароль неверный, попробуйте ещё раз: "); Console.ResetColor(); password = Console.ReadLine();
             }
 
             // ПОПРОБОВАТЬ СДЕЛАТЬ ТАК, ЧТОБЫ ПОТОК this.streamReader открывался тут, а дальше, не закрываясь и не открываясь повторно, использовался в isPasswordCorrect() и потом в ReadFromFile();
@@ -109,24 +111,28 @@ namespace EXQuiz
         {
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[РЕГИСТРАЦИЯ НОВОГО АККАУНТА]"); Console.ResetColor();
 
-            //
-            Console.Write("придумайте ваш логин: "); string login = Console.ReadLine();
+            Console.Write("\nПридумайте ваш логин: "); string login = Console.ReadLine();
             while (this.isLoginExist(login))
             {
-                Console.ForegroundColor = ConsoleColor.Red; Console.Write("введённый логин уже занят, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый логин уже занят, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
             }
 
-            //
-            Console.Write("придумайте ваш пароль: "); string password = Console.ReadLine();
+            Console.Write("Придумайте ваш пароль: "); string password = Console.ReadLine();
             while (this.isPasswordSimple(login, password))
             {
-                Console.ForegroundColor = ConsoleColor.Red; Console.Write("введённый пароль слишком простой, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый пароль слишком простой, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
             }
 
-            Console.Write("введите своё имя: "); string name = Console.ReadLine();
-            Console.Write("введите свою дату рождения: ПОКА СТАТИЧЕСКИ"); DateOnly birthDay = new DateOnly(2004, 06, 24);
+            Console.Write("\nВведите своё имя: "); string name = Console.ReadLine();
+            Console.Write("Введите свою дату рождения в формате 30.04.2023: "); string input = Console.ReadLine(); DateOnly newBirthDay = new DateOnly();
 
-            this.WriteToFile(login, password, name, birthDay);
+            while (!this.isBirthDayCorrect(input, ref newBirthDay))
+            {
+                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённая дата некорректна, попробуйте ещё раз: "); Console.ResetColor(); input = Console.ReadLine();
+                break;
+            }
+
+            this.WriteToFile(login, password, name, newBirthDay);
         }
 
 
@@ -135,7 +141,7 @@ namespace EXQuiz
 
         private bool isLoginExist(string login)
         {
-            DirectoryInfo directoryInfo = new DirectoryInfo(this.path + "Users"); // открытие директории Users
+            DirectoryInfo directoryInfo = new DirectoryInfo(this.pathToUsers); // открытие директории Users
 
             foreach (DirectoryInfo directory in directoryInfo.GetDirectories()) // получение каждой папки оттуда
             {
@@ -150,9 +156,9 @@ namespace EXQuiz
 
         private bool isPasswordCorrect(string login, string password)
         {
-            this.streamReader = new StreamReader(this.path + @"Users\" + login + @"\" + login + ".txt");
+            this.streamReader = new StreamReader(this.pathToUsers + login + @"\" + login + ".txt");
 
-            string buf = this.streamReader.ReadLine();
+            this.streamReader.ReadLine(); // считывание в пустоту
             if (password == this.streamReader.ReadLine())
             {
                 return true;
@@ -164,6 +170,7 @@ namespace EXQuiz
         private bool isPasswordSimple(string login, string password)
         {
             // TO DO
+            // ДУМАЮ, ПРОВЕРКУ НА QWERTY ИЛИ 1234 НЕ ДЕЛАТЬ, ПРОСТО ОБЯЗАТЬ ЧЕРЕЗ REGEX, ЧТОБЫ В ПАРОЛЕ БЫЛИ ЗАГЛАВНЫЕ, СТРОЧНЫЕ БУКВЫ И ЦИФРЫ
             return false;
         }
 
@@ -180,13 +187,14 @@ namespace EXQuiz
                     date.Add(Convert.ToInt32(str));
                 }
 
-                if (date[0] > 0 && date[0] <= 31)
+                try
+                {         
+                    birthDay = new DateOnly(date[2], date[1], date[0]);
+                    return true;
+                }
+                catch
                 {
-                    if (date[1] > 0 && date[1] <= 12)
-                    {
-                        birthDay = new DateOnly(date[2], date[1], date[0]);
-                        return true;
-                    }
+                    return false;
                 }
             }
             return false;
@@ -255,33 +263,22 @@ namespace EXQuiz
 
         public void StartNewQuiz()
         {
-            // ЭТОТ БЛОК НУЖНО БЫ ПЕРЕНЕСТИ В QuizMenu
-            StreamReader streamReader = null;
-            Dictionary<string, string> quizzes = new Dictionary<string, string>(); // создание словаря, где будет хранится имя и описание каждой викторины
-            DirectoryInfo directoryInfo = new DirectoryInfo(this.path + "Quizzes"); // открытие директории Quizzes
-            foreach (FileInfo file in directoryInfo.GetFiles()) // получение каждого файла оттуда
+            QuizMenu quizMenu = new QuizMenu(this.pathToQuizzes); // отображение меню с викторинами
+            string quizName = quizMenu.GetSelectedQuiz; // получение выбранной викторины
+            if (quizName == null)
             {
-                streamReader = new StreamReader(file.FullName);
-                quizzes.Add(streamReader.ReadLine(), streamReader.ReadLine());
+                return;
             }
-            //
 
-
-            //
-            QuizMenu quizMenu = new QuizMenu(0, (byte)(quizzes.Count() - 1), quizzes);
-            string quizName = quizMenu.Choice();
-            streamReader = new StreamReader(this.path + @"Quizzes\" + quizName + ".txt");
-
-            StreamWriter streamWriter = new StreamWriter(this.path + @"Users\" + this.user.login + @"\QuizzesResults\" + quizName + " " + DateTime.Now.Hour + "-" + DateTime.Now.Minute + "-" + DateTime.Now.Second + " " + DateTime.Now.Year + "-" + DateTime.Now.Month + "-" + DateTime.Now.Day + ".txt"); // создание файла с результатами
+            StreamReader streamReader = new StreamReader(this.pathToQuizzes + quizName + ".txt");
+            StreamWriter streamWriter = new StreamWriter(this.pathToUsers + this.user.login + @"\QuizzesResults\" + quizName + " " + DateTime.Now.Hour + "-" + DateTime.Now.Minute + "-" + DateTime.Now.Second + " " + DateTime.Now.Year + "-" + DateTime.Now.Month + "-" + DateTime.Now.Day + ".txt"); // создание файла с результатами
             streamWriter.WriteLine(quizName + "\n");
 
-            //
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[{quizName}]"); Console.ResetColor();
+            Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[{quizName}]"); Console.ResetColor();
 
             List<string> listOfAnswer = new List<string>(5) { "" };
-            string answer = null;
-            string question = null;
+            string answer;
+            string question;
             byte counterCorrectAnswer = 0;
 
             streamReader.ReadLine(); // считывание в пустоту (название викторины)
@@ -327,20 +324,16 @@ namespace EXQuiz
 
         public void ShowQuizzesResult()
         {
-            List<string> results = new List<string>(); // создание списка, где будет хранится имя каждого файла-результата викторины
-            DirectoryInfo directoryInfo = new DirectoryInfo(this.path + @"Users\" + this.user.login + @"\QuizzesResults\"); // открытие директории с файлами-результатами викторины
-            foreach (FileInfo file in directoryInfo.GetFiles()) // получение каждого файла оттуда
+            ResultMenu resultMenu = new ResultMenu(this.pathToUsers + this.user.login + @"\QuizzesResults\"); // отображение меню с результатами викторин
+            string resultName = resultMenu.GetSelectedResult; // получение выбранного результата
+            if (resultName == null)
             {
-                results.Add(file.Name.Remove(file.Name.LastIndexOf('.'))); // этот весь огород нужен для того, чтобы отсечь .txt (получается последний индекс вхождения . c помощью LastIndexOf, по этому этому индексу Remove отсекает часть строки)
-                //results.Add(file.Name);
-
+                return;
             }
 
-            ResultMenu resultMenu = new ResultMenu(0, 3, results);
-            string result = resultMenu.Choice();
-            StreamReader streamReader = new StreamReader(this.path + @"Users\" + this.user.login + @"\QuizzesResults\" + result + ".txt");
+            StreamReader streamReader = new StreamReader(this.pathToUsers + this.user.login + @"\QuizzesResults\" + resultName + ".txt");
 
-            Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[{result}]"); Console.ResetColor();
+            Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[{resultName}]"); Console.ResetColor();
 
             streamReader.ReadLine(); // считывание в пустоту
             streamReader.ReadLine(); // считывание в пустоту
@@ -378,6 +371,8 @@ namespace EXQuiz
             Console.Write("Для продолжения нажмите любую кнопку.."); Console.ReadKey();
         }
 
+
+
         public void ChangePassword()
         {
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ИЗМЕНЕНИЕ ПАРОЛЯ]"); Console.ResetColor();
@@ -390,8 +385,8 @@ namespace EXQuiz
                 Console.ForegroundColor = ConsoleColor.Red; Console.Write("Новый пароль не должен совпадать со старым, попробуйте ещё раз: "); Console.ResetColor(); newPassword = Console.ReadLine();
             }
 
-            Console.WriteLine(File.Exists(this.path + @"Users\" + this.user.login + @"\" + this.user.login + ".txt"));
-            File.Delete(this.path + @"Users\" + this.user.login + @"\" + this.user.login + ".txt");
+            Console.WriteLine(File.Exists(this.pathToUsers + this.user.login + @"\" + this.user.login + ".txt"));
+            File.Delete(this.pathToUsers + this.user.login + @"\" + this.user.login + ".txt");
 
             if (this.user is Testee)
             {
@@ -407,6 +402,7 @@ namespace EXQuiz
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("\nПароль упешно изменён!"); Console.ResetColor();
             Console.Write("Для продолжения нажмите любую кнопку.."); Console.ReadKey();
         }
+
 
         public void ChangeBirthDay()
         {
@@ -428,6 +424,5 @@ namespace EXQuiz
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("\nДата рождения упешно изменена!"); Console.ResetColor();
             Console.Write("Для продолжения нажмите любую кнопку.."); Console.ReadKey();
         }
-
     }
 }

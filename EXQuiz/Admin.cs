@@ -10,7 +10,6 @@ namespace EXQuiz
     {
         private string path = @"C:\SDMQuiz\"; // TEMP
 
-
         public Admin(string login, string password) : base(login, password) { }
 
         public void CreateUser()
@@ -113,28 +112,8 @@ namespace EXQuiz
         {
             Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[УДАЛЕНИЕ ВИКТОРИНЫ]"); Console.ResetColor();
 
-            // ЭТОТ БЛОК НУЖНО БЫ ПЕРЕНЕСТИ В QuizMenu
-            StreamReader streamReader = null;
-            Dictionary<string, string> quizzes = new Dictionary<string, string>(); // создание словаря, где будет хранится имя и описание каждой викторины
-            DirectoryInfo directoryInfo = new DirectoryInfo(this.path + "Quizzes"); // открытие директории Quizzes
-            string quizName2;
-            string quizDescription;
-            foreach (FileInfo file in directoryInfo.GetFiles()) // получение каждого файла оттуда
-            {
-                streamReader = new StreamReader(file.FullName);
-
-                quizName2 = streamReader.ReadLine();
-                quizDescription = streamReader.ReadLine();
-
-                if (quizName2 != null && quizDescription != null) // ТУТ ПУНКТ 4 ПОФИКШЕН
-                {
-                    quizzes.Add(quizName2, quizDescription);
-                }
-            }
-            //
-
-            QuizMenu quizMenu = new QuizMenu(0, (byte)(quizzes.Count() - 1), quizzes);
-            string quizName = quizMenu.Choice();
+            QuizMenu quizMenu = new QuizMenu(this.path + "Quizzes"); // отображение меню с викторинами
+            string quizName = quizMenu.GetSelectedQuiz; // получение выбранной викторины
 
             File.Delete(this.path + @"Quizzes\" + quizName + ".txt");
 

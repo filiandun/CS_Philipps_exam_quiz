@@ -11,6 +11,8 @@ namespace EXQuiz
         public string name;
         public DateOnly birthDay;
 
+        public string pathToResultFile;
+
         public Testee(string login, string password, string name, DateOnly birthDay) : base(login, password)
         {
             this.name = name;

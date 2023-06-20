@@ -29,7 +29,7 @@ namespace EXQuiz
             switch (this.currentPosition)
             {
                 case 0:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]\n"); Console.ResetColor();
                     Console.WriteLine("> вход");
                     Console.WriteLine("  регистрация\n");
 
@@ -37,7 +37,7 @@ namespace EXQuiz
                     break;
 
                 case 1:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]\n"); Console.ResetColor();
                     Console.WriteLine("  вход");
                     Console.WriteLine("> регистрация\n");
 
@@ -45,7 +45,7 @@ namespace EXQuiz
                     break;
 
                 case 2:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]\n"); Console.ResetColor();
                     Console.WriteLine("  вход");
                     Console.WriteLine("  регистрация\n");
 
@@ -94,7 +94,7 @@ namespace EXQuiz
             switch (this.currentPosition)
             {
                 case 0:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК,  , ВЫ В SDMQ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК,  , ВЫ В SDMQ]\n"); Console.ResetColor();
                     Console.WriteLine("> начать новую викторину\n");
 
                     Console.WriteLine("  посмотреть свои результаты прошлых викторин");
@@ -108,7 +108,7 @@ namespace EXQuiz
                     break;
 
                 case 1:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК,  , ВЫ В SDMQ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК,  , ВЫ В SDMQ]\n"); Console.ResetColor();
                     Console.WriteLine("  начать новую викторину\n");
 
                     Console.WriteLine("> посмотреть свои результаты прошлых викторин");
@@ -122,7 +122,7 @@ namespace EXQuiz
                     break;
 
                 case 2:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]\n"); Console.ResetColor();
                     Console.WriteLine("  начать новую викторину\n");
 
                     Console.WriteLine("  посмотреть свои результаты прошлых викторин");
@@ -136,7 +136,7 @@ namespace EXQuiz
                     break;
 
                 case 3:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]\n"); Console.ResetColor();
                     Console.WriteLine("  начать новую викторину\n");
 
                     Console.WriteLine("  посмотреть свои результаты прошлых викторин");
@@ -150,7 +150,7 @@ namespace EXQuiz
                     break;
 
                 case 4:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]\n"); Console.ResetColor();
                     Console.WriteLine("  начать новую викторину\n");
 
                     Console.WriteLine("  посмотреть свои результаты прошлых викторин");
@@ -164,7 +164,7 @@ namespace EXQuiz
                     break;
 
                 case 5:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]"); Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]\n"); Console.ResetColor();
                     Console.WriteLine("  начать новую викторину\n");
 
                     Console.WriteLine("  посмотреть свои результаты прошлых викторин");
@@ -345,43 +345,71 @@ namespace EXQuiz
 
 
 
+
     public class QuizMenu
     {
-        private byte currentPosition;
         private byte minPosition;
         private byte maxPosition;
-        Dictionary<string, string> dictionary;
-        public string currentKey;
+        private byte currentPosition;
 
-        public QuizMenu(byte minPosition, byte maxPosition, Dictionary<string, string> dictionary)
+        Dictionary<string, string> quizzesDictionary;
+
+        public string selectedQuiz;
+
+        public QuizMenu(string path)
         {
-            this.minPosition = minPosition;
-            this.maxPosition = maxPosition;
-            this.dictionary = dictionary;
+            string quizName;
+            string quizDescription;
+            StreamReader streamReader; // ВОПРОС: как лучше, перезаписывать переменную в цикле (как сейчас) или создавать её заново?
+
+            this.quizzesDictionary = new Dictionary<string, string>(); // инициализация словаря, где будет хранится имя и описание каждой викторины
+
+            DirectoryInfo directoryInfo = new DirectoryInfo(path); // открытие директории с викторинами
+            foreach (FileInfo file in directoryInfo.GetFiles()) // получение каждого файла оттуда
+            {
+                streamReader = new StreamReader(file.FullName);
+
+                quizName = streamReader.ReadLine();
+                quizDescription = streamReader.ReadLine();
+
+                if (quizName != null && quizDescription != null) // ТУТ ПУНКТ 4 ПОФИКШЕН
+                {
+                    this.quizzesDictionary.Add(quizName, quizDescription);
+                }
+
+                streamReader.Close();
+            }
+
+            this.minPosition = 1;
+            this.maxPosition = (byte)(this.quizzesDictionary.Count);
+            this.currentPosition = minPosition;
+
+            this.Choice(); // вызов меню
         }
 
-        public void Menu()
+        private void Menu()
         {
-            byte i = 0;
+            byte i = 1;
 
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[СТАРТ НОВОЙ ВИКТОРИНЫ]"); Console.ResetColor();
-            Console.WriteLine("Список викторин и их небольшое описание: ");
-            foreach (var obj in this.dictionary)
+            Console.WriteLine("\nСписок викторин и их небольшое описание:\n");
+            foreach (var obj in this.quizzesDictionary)
             {
                 if (i == this.currentPosition)
                 {
-                    Console.WriteLine($"> {i + 1}. {obj.Key} - \"{obj.Value}\"");
-                    this.currentKey = obj.Key;
+                    Console.WriteLine($"> {i}. {obj.Key} - \"{obj.Value}\"");
+                    this.selectedQuiz = obj.Key;
                 }
                 else
                 {
-                    Console.WriteLine($"  {i + 1}. {obj.Key} - \"{obj.Value}\"");
+                    Console.WriteLine($"  {i}. {obj.Key} - \"{obj.Value}\"");
                 }
                 ++i;
             }
+            Console.Write("\nESC - назад");
         }
 
-        public string Choice()
+        private void Choice()
         {
             ConsoleKeyInfo key;
 
@@ -395,52 +423,75 @@ namespace EXQuiz
                     case ConsoleKey.UpArrow: Console.Clear(); if (this.currentPosition > minPosition) { --this.currentPosition; } this.Menu(); break; // нажата клавиша вверх
                     case ConsoleKey.DownArrow: Console.Clear(); if (this.currentPosition < maxPosition) { ++this.currentPosition; } this.Menu(); break; // нажата клавиша вниз
 
-                    case ConsoleKey.Enter: return this.currentKey;
+                    case ConsoleKey.Enter: return;
+                    case ConsoleKey.Escape: this.selectedQuiz = null; return;
 
                     default: Console.Clear(); this.Menu(); break;
                 }
             }
             while (true);
+        }
+
+        public string GetSelectedQuiz
+        {
+            get
+            {
+                return this.selectedQuiz;
+            }
         }
     }
 
 
 
 
+
     public class ResultMenu
     {
-        private byte currentPosition;
         private byte minPosition;
         private byte maxPosition;
-        public string currentResult;
-        List<string> list;
+        private byte currentPosition;
 
-        public ResultMenu(byte minPosition, byte maxPosition, List<string> list)
+        List<string> resultsList;
+
+        public string selectedResult;
+
+        public ResultMenu(string path)
         {
-            this.minPosition = minPosition;
-            this.maxPosition = maxPosition;
-            this.list = list;
+            this.resultsList = new List<string>(); // инициализация списка, где будет хранится имя каждого файла-результата викторины
+
+            DirectoryInfo directoryInfo = new DirectoryInfo(path); // открытие директории с файлами-результатами викторины
+            foreach (FileInfo file in directoryInfo.GetFiles()) // получение каждого файла оттуда
+            {
+                this.resultsList.Add(file.Name.Remove(file.Name.LastIndexOf('.'))); // этот весь огород нужен для того, чтобы отсечь ".txt" (возвращается последний индекс вхождения точки (.) c помощью LastIndexOf, а Remove отсекает часть строки после этого индекса)
+            }
+
+            this.minPosition = 0;
+            this.maxPosition = (byte) (this.resultsList.Count - 1);
+            this.currentPosition = minPosition;
+
+            this.Choice();
         }
 
         public void Menu()
         {
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[СТАРТ НОВОЙ ВИКТОРИНЫ]"); Console.ResetColor();
-            Console.WriteLine("Список результатов викторин: ");
-            for (int i = 0; i < this.list.Count(); ++i)
+            Console.WriteLine("\nСписок результатов викторин:\n");
+            for (int i = 0; i < this.resultsList.Count; ++i)
             {
                 if (i == this.currentPosition)
                 {
-                    Console.WriteLine($"> {i + 1}. {this.list[i]}");
-                    this.currentResult = this.list[i];
+                    Console.WriteLine($"> {i + 1}. {this.resultsList[i]}");
+                    this.selectedResult = this.resultsList[i];
                 }
                 else
                 {
-                    Console.WriteLine($"  {i + 1}. {this.list[i]}");
+                    Console.WriteLine($"  {i + 1}. {this.resultsList[i]}");
                 }
             }
+            Console.Write("\nESC - назад");
         }
 
-        public string Choice()
+        public void Choice()
         {
             ConsoleKeyInfo key;
 
@@ -454,12 +505,21 @@ namespace EXQuiz
                     case ConsoleKey.UpArrow: Console.Clear(); if (this.currentPosition > minPosition) { --this.currentPosition; } this.Menu(); break; // нажата клавиша вверх
                     case ConsoleKey.DownArrow: Console.Clear(); if (this.currentPosition < maxPosition) { ++this.currentPosition; } this.Menu(); break; // нажата клавиша вниз
 
-                    case ConsoleKey.Enter: return this.currentResult;
+                    case ConsoleKey.Enter: return;
+                    case ConsoleKey.Escape: this.selectedResult = null; return;
 
                     default: Console.Clear(); this.Menu(); break;
                 }
             }
             while (true);
+        }
+
+        public string GetSelectedResult
+        {
+            get
+            {
+                return this.selectedResult;
+            }
         }
     }
 }
