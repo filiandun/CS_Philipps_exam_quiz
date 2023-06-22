@@ -3,342 +3,168 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+
 
 namespace EXQuiz
 {
-    internal class MainMenu
+    internal static class MainMenu
     {
-        private byte currentPosition;
-        private byte minPosition;
-        private byte maxPosition;
+        private static byte currentPosition;
 
-        public MainMenu(byte minPosition, byte maxPosition)
+        private const byte minPosition = 0;
+        private const byte maxPosition = 2;
+
+
+        public static void DisplayMenu()
         {
-            this.currentPosition = 0;
-            this.minPosition = minPosition;
-            this.maxPosition = maxPosition;
-        }
-
-        private void Menu()
-        {
-            this.minPosition = 0;
-            this.maxPosition = 2;
-
-            switch (this.currentPosition)
-            {
-                case 0:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]\n"); Console.ResetColor();
-                    Console.WriteLine("> вход");
-                    Console.WriteLine("  регистрация\n");
-
-                    Console.WriteLine("  выход");
-                    break;
-
-                case 1:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]\n"); Console.ResetColor();
-                    Console.WriteLine("  вход");
-                    Console.WriteLine("> регистрация\n");
-
-                    Console.WriteLine("  выход");
-                    break;
-
-                case 2:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]\n"); Console.ResetColor();
-                    Console.WriteLine("  вход");
-                    Console.WriteLine("  регистрация\n");
-
-                    Console.WriteLine("> выход");
-                    break;
-            }
-        }
-
-        public byte Choice()
-        {
-            ConsoleKeyInfo key;
-
-            this.Menu();
+            currentPosition = 0;
             do
             {
-                key = Console.ReadKey(); // считывание значения нажатой клавиши
+                Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[SUPER DUPER MEGA QUIZ]\n"); Console.ResetColor();
 
-                switch (key.Key)
-                {
-                    case ConsoleKey.UpArrow: Console.Clear(); if (this.currentPosition > minPosition) { --this.currentPosition; } this.Menu(); break; // нажата клавиша вверх
-                    case ConsoleKey.DownArrow: Console.Clear(); if (this.currentPosition < maxPosition) { ++this.currentPosition; } this.Menu(); break; // нажата клавиша вниз
+                Console.WriteLine(currentPosition == 0 ? "> вход" : "  вход");
+                Console.WriteLine(currentPosition == 1 ? "> регистрация\n" : "  регистрация\n");
 
-                    case ConsoleKey.Enter: return this.currentPosition;
+                Console.WriteLine(currentPosition == 2 ? "> выход" : "  выход");
 
-                    default: Console.Clear(); this.Menu(); break;
-                }
             }
-            while (true);
+            while (HandleInput());
+        }
+
+
+        private static bool HandleInput()
+        {
+            ConsoleKeyInfo key = Console.ReadKey(); // считывание значения нажатой клавиши
+
+            switch (key.Key)
+            {
+                case ConsoleKey.UpArrow: if (currentPosition > minPosition) { --currentPosition; } break; // нажата клавиша вверх
+                case ConsoleKey.DownArrow: if (currentPosition < maxPosition) { ++currentPosition; } break; // нажата клавиша вниз
+
+                case ConsoleKey.Enter: return false;
+
+                default: break;
+            }
+            return true;
+        }
+
+
+        public static byte GetCurrentPosition
+        {
+            get { return currentPosition; }
         }
     }
 
-    public class TesteeMenu
+
+
+    public static class TesteeMenu
     {
-        private byte currentPosition;
-        private byte minPosition;
-        private byte maxPosition;
+        private static byte currentPosition = 0;
 
-        public TesteeMenu(byte minPosition, byte maxPosition)
+        private const byte minPosition = 0;
+        private const byte maxPosition = 6;
+
+        public static void DisplayMenu(string testeeName)
         {
-            this.minPosition = minPosition;
-            this.maxPosition = maxPosition;
-        }
-
-        public void Menu()
-        {
-            switch (this.currentPosition)
-            {
-                case 0:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК,  , ВЫ В SDMQ]\n"); Console.ResetColor();
-                    Console.WriteLine("> начать новую викторину\n");
-
-                    Console.WriteLine("  посмотреть свои результаты прошлых викторин");
-                    Console.WriteLine("  посмотреть ТОП-5 по конкретной викторине\n");
-
-                    Console.WriteLine("  изменить пароль");
-                    Console.WriteLine("  изменить дату рождения\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 1:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК,  , ВЫ В SDMQ]\n"); Console.ResetColor();
-                    Console.WriteLine("  начать новую викторину\n");
-
-                    Console.WriteLine("> посмотреть свои результаты прошлых викторин");
-                    Console.WriteLine("  посмотреть ТОП-5 по конкретной викторине\n");
-
-                    Console.WriteLine("  изменить пароль");
-                    Console.WriteLine("  изменить дату рождения\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 2:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]\n"); Console.ResetColor();
-                    Console.WriteLine("  начать новую викторину\n");
-
-                    Console.WriteLine("  посмотреть свои результаты прошлых викторин");
-                    Console.WriteLine("> посмотреть ТОП-5 по конкретной викторине\n");
-
-                    Console.WriteLine("  изменить пароль");
-                    Console.WriteLine("  изменить дату рождения\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 3:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]\n"); Console.ResetColor();
-                    Console.WriteLine("  начать новую викторину\n");
-
-                    Console.WriteLine("  посмотреть свои результаты прошлых викторин");
-                    Console.WriteLine("  посмотреть ТОП-5 по конкретной викторине\n");
-
-                    Console.WriteLine("> изменить пароль");
-                    Console.WriteLine("  изменить дату рождения\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 4:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]\n"); Console.ResetColor();
-                    Console.WriteLine("  начать новую викторину\n");
-
-                    Console.WriteLine("  посмотреть свои результаты прошлых викторин");
-                    Console.WriteLine("  посмотреть ТОП-5 по конкретной викторине\n");
-
-                    Console.WriteLine("  изменить пароль");
-                    Console.WriteLine("> изменить дату рождения\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 5:
-                    Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, , ВЫ В SDMQ]\n"); Console.ResetColor();
-                    Console.WriteLine("  начать новую викторину\n");
-
-                    Console.WriteLine("  посмотреть свои результаты прошлых викторин");
-                    Console.WriteLine("  посмотреть ТОП-5 по конкретной викторине\n");
-
-                    Console.WriteLine("  изменить пароль");
-                    Console.WriteLine("  изменить дату рождения\n");
-
-                    Console.WriteLine("> выйти");
-
-                    break;
-
-            }
-        }
-
-        public byte Choice()
-        {
-            ConsoleKeyInfo key;
-
-            this.Menu();
+            currentPosition = 0;
+            testeeName = testeeName.ToUpper();
             do
             {
-                key = Console.ReadKey(); // считывание значения нажатой клавиши
+                Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, {testeeName}, ВЫ В SDMQ]\n"); Console.ResetColor();
 
-                switch (key.Key)
-                {
-                    case ConsoleKey.UpArrow: Console.Clear(); if (this.currentPosition > minPosition) { --this.currentPosition; } this.Menu(); break; // нажата клавиша вверх
-                    case ConsoleKey.DownArrow: Console.Clear(); if (this.currentPosition < maxPosition) { ++this.currentPosition; } this.Menu(); break; // нажата клавиша вниз
+                Console.WriteLine(currentPosition == 0 ? "> начать новую викторину\n" : "  начать новую викторину\n");
 
-                    case ConsoleKey.Enter: return this.currentPosition;
+                Console.WriteLine(currentPosition == 1 ? "> посмотреть свои результаты прошлых викторин" : "  посмотреть свои результаты прошлых викторин");
+                Console.WriteLine(currentPosition == 2 ? "> посмотреть ТОП-5 по конкретной викторине\n" : "  посмотреть ТОП-5 по конкретной викторине\n");
 
-                    default: Console.Clear(); this.Menu(); break;
-                }
+                Console.WriteLine(currentPosition == 3 ? "> изменить пароль" : "  изменить пароль");
+                Console.WriteLine(currentPosition == 4 ? "> изменить имя" : "  изменить имя");
+                Console.WriteLine(currentPosition == 5 ? "> изменить дату рождения\n" : "  изменить дату рождения\n");
+
+                Console.WriteLine(currentPosition == 6 ? "> выйти" : "  выйти");
             }
-            while (true);
+            while (HandleInput());
+        }
+
+
+        private static bool HandleInput()
+        {
+            ConsoleKeyInfo key = Console.ReadKey(); // считывание значения нажатой клавиши
+
+            switch (key.Key)
+            {
+                case ConsoleKey.UpArrow: if (currentPosition > minPosition) { --currentPosition; } break; // нажата клавиша вверх
+                case ConsoleKey.DownArrow: if (currentPosition < maxPosition) { ++currentPosition; } break; // нажата клавиша вниз
+
+                case ConsoleKey.Enter: return false;
+
+                default: break;
+            }
+            return true;
+        }
+
+
+        public static byte GetCurrentPosition
+        {
+            get { return currentPosition; }
         }
     }
 
-    public class AdminMenu
+
+
+
+    public static class AdminMenu
     {
-        private byte currentPosition;
-        private byte minPosition;
-        private byte maxPosition;
+        private static byte currentPosition;
 
-        public AdminMenu(byte minPosition, byte maxPosition)
+        private const byte minPosition = 0;
+        private const byte maxPosition = 6;
+
+
+        public static void DisplayMenu()
         {
-            this.minPosition = minPosition;
-            this.maxPosition = maxPosition;
-        }
-
-        public void Menu()
-        {
-            switch (this.currentPosition)
-            {
-                case 0:
-                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, АДМИНИСТРАТОР]"); Console.ResetColor();
-                    Console.WriteLine("> зарегистрировать пользователя");
-                    Console.WriteLine("  изменить пользователя");
-                    Console.WriteLine("  удалить пользователя\n");
-
-                    Console.WriteLine("  создать викторину");
-                    Console.WriteLine("  изменить викторину");
-                    Console.WriteLine("  удалить викторину\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 1:
-                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, АДМИНИСТРАТОР]"); Console.ResetColor();
-                    Console.WriteLine("  зарегистрировать пользователя");
-                    Console.WriteLine("> изменить пользователя");
-                    Console.WriteLine("  удалить пользователя\n");
-
-                    Console.WriteLine("  создать викторину");
-                    Console.WriteLine("  изменить викторину");
-                    Console.WriteLine("  удалить викторину\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 2:
-                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, АДМИНИСТРАТОР]"); Console.ResetColor();
-                    Console.WriteLine("  зарегистрировать пользователя");
-                    Console.WriteLine("  изменить пользователя");
-                    Console.WriteLine("> удалить пользователя\n");
-
-                    Console.WriteLine("  создать викторину");
-                    Console.WriteLine("  изменить викторину");
-                    Console.WriteLine("  удалить викторину\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 3:
-                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, АДМИНИСТРАТОР]"); Console.ResetColor();
-                    Console.WriteLine("  зарегистрировать пользователя");
-                    Console.WriteLine("  изменить пользователя");
-                    Console.WriteLine("  удалить пользователя\n");
-
-                    Console.WriteLine("> создать викторину");
-                    Console.WriteLine("  изменить викторину");
-                    Console.WriteLine("  удалить викторину\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 4:
-                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, АДМИНИСТРАТОР]"); Console.ResetColor();
-                    Console.WriteLine("  зарегистрировать пользователя");
-                    Console.WriteLine("  изменить пользователя");
-                    Console.WriteLine("  удалить пользователя\n");
-
-                    Console.WriteLine("  создать викторину");
-                    Console.WriteLine("> изменить викторину");
-                    Console.WriteLine("  удалить викторину\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 5:
-                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, АДМИНИСТРАТОР]"); Console.ResetColor();
-                    Console.WriteLine("  зарегистрировать пользователя");
-                    Console.WriteLine("  изменить пользователя");
-                    Console.WriteLine("  удалить пользователя\n");
-
-                    Console.WriteLine("  создать викторину");
-                    Console.WriteLine("  изменить викторину");
-                    Console.WriteLine("> удалить викторину\n");
-
-                    Console.WriteLine("  выйти");
-
-                    break;
-
-                case 6:
-                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, АДМИНИСТРАТОР]"); Console.ResetColor();
-                    Console.WriteLine("  зарегистрировать пользователя");
-                    Console.WriteLine("  изменить пользователя");
-                    Console.WriteLine("  удалить пользователя\n");
-
-                    Console.WriteLine("  создать викторину");
-                    Console.WriteLine("  изменить викторину");
-                    Console.WriteLine("  удалить викторину\n");
-
-                    Console.WriteLine("> выйти");
-
-                    break;
-            }
-        }
-
-        public byte Choice()
-        {
-            ConsoleKeyInfo key;
-
-            this.Menu();
+            currentPosition = 0;
             do
             {
-                key = Console.ReadKey(); // считывание значения нажатой клавиши
+                Console.Clear(); Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"[ДОБРОГО ВРЕМЕНИ СУТОК, АДМИНИСТРАТОР]\n"); Console.ResetColor();
 
-                switch (key.Key)
-                {
-                    case ConsoleKey.UpArrow: Console.Clear(); if (this.currentPosition > minPosition) { --this.currentPosition; } this.Menu(); break; // нажата клавиша вверх
-                    case ConsoleKey.DownArrow: Console.Clear(); if (this.currentPosition < maxPosition) { ++this.currentPosition; } this.Menu(); break; // нажата клавиша вниз
+                Console.WriteLine(currentPosition == 0 ? "> зарегистрировать пользователя" : "  зарегистрировать пользователя");
+                Console.WriteLine(currentPosition == 1 ? "> изменить пользователя" : "  изменить пользователя");
+                Console.WriteLine(currentPosition == 2 ? "> удалить пользователя\n" : "  удалить пользователя\n");
 
-                    case ConsoleKey.Enter: return this.currentPosition;
+                Console.WriteLine(currentPosition == 3 ? "> создать викторину" : "  создать викторину");
+                Console.WriteLine(currentPosition == 4 ? "> изменить викторину" : "  изменить викторину");
+                Console.WriteLine(currentPosition == 5 ? "> удалить викторину\n" : "  удалить викторину\n");
 
-                    default: Console.Clear(); this.Menu(); break;
-                }
+                Console.WriteLine(currentPosition == 6 ? "> выйти" : "  выйти");
+            } 
+            while (HandleInput());
+        }
+
+
+        private static bool HandleInput()
+        {
+            ConsoleKeyInfo key = Console.ReadKey(); // считывание значения нажатой клавиши
+
+            switch (key.Key)
+            {
+                case ConsoleKey.UpArrow: Console.Clear(); if (currentPosition > minPosition) { --currentPosition; } break; // нажата клавиша вверх
+                case ConsoleKey.DownArrow: Console.Clear(); if (currentPosition < maxPosition) { ++currentPosition; } break; // нажата клавиша вниз
+
+                case ConsoleKey.Enter: return false;
+
+                default: Console.Clear(); break;
             }
-            while (true);
+            return true;
+        }
+
+        public static byte GetCurrentPosition
+        {
+            get { return currentPosition; }
         }
     }
 
@@ -348,31 +174,33 @@ namespace EXQuiz
 
     public class QuizMenu
     {
+        private byte currentPosition;
+
         private byte minPosition;
         private byte maxPosition;
-        private byte currentPosition;
 
         Dictionary<string, string> quizzesDictionary;
 
         public string selectedQuiz;
 
-        public QuizMenu(string path)
+        public QuizMenu()
         {
             string quizName;
             string quizDescription;
-            StreamReader streamReader; // ВОПРОС: как лучше, перезаписывать переменную в цикле (как сейчас) или создавать её заново?
+            StreamReader streamReader; 
 
             this.quizzesDictionary = new Dictionary<string, string>(); // инициализация словаря, где будет хранится имя и описание каждой викторины
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(path); // открытие директории с викторинами
+            DirectoryInfo directoryInfo = new DirectoryInfo(Paths.pathToQuizzes); // открытие директории с викторинами
             foreach (FileInfo file in directoryInfo.GetFiles()) // получение каждого файла оттуда
             {
                 streamReader = new StreamReader(file.FullName);
+                streamReader.ReadLine(); // считывание в пустоту
 
-                quizName = streamReader.ReadLine();
+                quizName = file.Name.Remove(file.Name.LastIndexOf('.')); // этот весь огород нужен для того, чтобы отсечь ".txt"(возвращается последний индекс вхождения точки(.) c помощью LastIndexOf, а Remove отсекает часть строки после этого индекса)
                 quizDescription = streamReader.ReadLine();
 
-                if (quizName != null && quizDescription != null) // ТУТ ПУНКТ 4 ПОФИКШЕН
+                if (quizName != null && quizDescription != null && !this.quizzesDictionary.ContainsKey(quizName)) // ТУТ ПУНКТ 4 ПОФИКШЕН
                 {
                     this.quizzesDictionary.Add(quizName, quizDescription);
                 }
@@ -383,53 +211,49 @@ namespace EXQuiz
             this.minPosition = 1;
             this.maxPosition = (byte)(this.quizzesDictionary.Count);
             this.currentPosition = minPosition;
-
-            this.Choice(); // вызов меню
         }
 
-        private void Menu()
+        public void DisplayMenu(ConsoleColor consoleColor, string text)
         {
             byte i = 1;
-
-            Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[СТАРТ НОВОЙ ВИКТОРИНЫ]"); Console.ResetColor();
-            Console.WriteLine("\nСписок викторин и их небольшое описание:\n");
-            foreach (var obj in this.quizzesDictionary)
-            {
-                if (i == this.currentPosition)
-                {
-                    Console.WriteLine($"> {i}. {obj.Key} - \"{obj.Value}\"");
-                    this.selectedQuiz = obj.Key;
-                }
-                else
-                {
-                    Console.WriteLine($"  {i}. {obj.Key} - \"{obj.Value}\"");
-                }
-                ++i;
-            }
-            Console.Write("\nESC - назад");
-        }
-
-        private void Choice()
-        {
-            ConsoleKeyInfo key;
-
-            this.Menu();
             do
             {
-                key = Console.ReadKey(); // считывание значения нажатой клавиши
-
-                switch (key.Key)
+                i = 1;
+                Console.Clear(); Console.ForegroundColor = consoleColor; Console.WriteLine($"[{text}]"); Console.ResetColor();
+                Console.WriteLine("\nСписок викторин и их небольшое описание:\n");
+                foreach (var obj in this.quizzesDictionary)
                 {
-                    case ConsoleKey.UpArrow: Console.Clear(); if (this.currentPosition > minPosition) { --this.currentPosition; } this.Menu(); break; // нажата клавиша вверх
-                    case ConsoleKey.DownArrow: Console.Clear(); if (this.currentPosition < maxPosition) { ++this.currentPosition; } this.Menu(); break; // нажата клавиша вниз
-
-                    case ConsoleKey.Enter: return;
-                    case ConsoleKey.Escape: this.selectedQuiz = null; return;
-
-                    default: Console.Clear(); this.Menu(); break;
+                    if (i == this.currentPosition)
+                    {
+                        Console.WriteLine($"> {obj.Key} - \"{obj.Value}\"");
+                        this.selectedQuiz = obj.Key;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  {obj.Key} - \"{obj.Value}\"");
+                    }
+                    ++i;
                 }
+                Console.Write("\nESC - назад");
             }
-            while (true);
+            while (HandleInput());
+        }
+
+        private bool HandleInput()
+        {
+            ConsoleKeyInfo key = Console.ReadKey(); // считывание значения нажатой клавиши
+
+            switch (key.Key)
+            {
+                case ConsoleKey.UpArrow: Console.Clear(); if (currentPosition > minPosition) { --currentPosition; } break; // нажата клавиша вверх
+                case ConsoleKey.DownArrow: Console.Clear(); if (currentPosition < maxPosition) { ++currentPosition; } break; // нажата клавиша вниз
+
+                case ConsoleKey.Enter: return false;
+                case ConsoleKey.Escape: this.selectedQuiz = null; return false;
+
+                default: Console.Clear(); break;
+            }
+            return true;
         }
 
         public string GetSelectedQuiz
@@ -472,9 +296,9 @@ namespace EXQuiz
             this.Choice();
         }
 
-        public void Menu()
+        public void DisplayMenu()
         {
-            Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[СТАРТ НОВОЙ ВИКТОРИНЫ]"); Console.ResetColor();
+            Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[СТАРТ НОВОЙ ВИКТОРИНЫ]"); Console.ResetColor();
             Console.WriteLine("\nСписок результатов викторин:\n");
             for (int i = 0; i < this.resultsList.Count; ++i)
             {
@@ -495,20 +319,20 @@ namespace EXQuiz
         {
             ConsoleKeyInfo key;
 
-            this.Menu();
+            this.DisplayMenu();
             do
             {
                 key = Console.ReadKey(); // считывание значения нажатой клавиши
 
                 switch (key.Key)
                 {
-                    case ConsoleKey.UpArrow: Console.Clear(); if (this.currentPosition > minPosition) { --this.currentPosition; } this.Menu(); break; // нажата клавиша вверх
-                    case ConsoleKey.DownArrow: Console.Clear(); if (this.currentPosition < maxPosition) { ++this.currentPosition; } this.Menu(); break; // нажата клавиша вниз
+                    case ConsoleKey.UpArrow: Console.Clear(); if (this.currentPosition > minPosition) { --this.currentPosition; } this.DisplayMenu(); break; // нажата клавиша вверх
+                    case ConsoleKey.DownArrow: Console.Clear(); if (this.currentPosition < maxPosition) { ++this.currentPosition; } this.DisplayMenu(); break; // нажата клавиша вниз
 
                     case ConsoleKey.Enter: return;
                     case ConsoleKey.Escape: this.selectedResult = null; return;
 
-                    default: Console.Clear(); this.Menu(); break;
+                    default: Console.Clear(); this.DisplayMenu(); break;
                 }
             }
             while (true);

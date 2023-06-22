@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,30 +9,33 @@ namespace EXQuiz
 {
     internal class Admin : User
     {
-        private string path = @"C:\SDMQuiz\"; // TEMP
-
         public Admin(string login, string password) : base(login, password) { }
 
         public void CreateUser()
         {
-            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[РЕГИСТРАЦИЯ ПОЛЬЗОВАТЕЛЯ]"); Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[РЕГИСТРАЦИЯ ПОЛЬЗОВАТЕЛЯ]\n"); Console.ResetColor();
 
             Console.Write("Придумайте логин пользователю: "); string login = Console.ReadLine();
-            while (false/*this.isLoginExist(login)*/)
+            while (Is.LoginExist(login))
             {
                 Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый логин уже занят, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
             }
 
             Console.Write("Придумайте пароль пользователю: "); string password = Console.ReadLine();
-            while (false/*this.isPasswordSimple(login, password)*/)
+            while (Is.PasswordSimple(login, password))
             {
                 Console.ForegroundColor = ConsoleColor.Red; Console.Write("Ввведённый пароль слишком простой, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
             }
 
             Console.Write("Введите имя пользователя: "); string name = Console.ReadLine();
-            Console.Write("Введите дату рождения пользователя: ПОКА СТАТИЧЕСКИ"); DateOnly birthDay = new DateOnly(2004, 06, 24);
+            Console.Write("Введите дату рождения пользователя в формате 30.04.2023: "); string input = Console.ReadLine(); DateOnly birthDay;
 
-            // this.WriteToFile(login, password, name, birthDay);
+            while (!DateOnly.TryParseExact(input, "dd.MM.yyyy", out birthDay))
+            {
+                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённая дата некорректна, попробуйте ещё раз: "); Console.ResetColor(); input = Console.ReadLine();
+            }
+
+            StreamWriterReader.WriteToFile(new Testee(login, password, name, birthDay));
 
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("\nПользователь успешно зарегистрирован!"); Console.ResetColor();
             Console.Write("Для продолжения нажмите любую кнопку.."); Console.ReadKey();
@@ -44,15 +48,15 @@ namespace EXQuiz
 
         public void DeleteUser()
         {
-            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ]"); Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ]\n"); Console.ResetColor();
 
             Console.Write("Введите логин пользователя: "); string login = Console.ReadLine();
-            while (false/*this.isLoginExist(login)*/)
+            while (Is.LoginExist(login))
             {
                 Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый логин не соответсвует ни одному пользователю, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine();
             }
 
-            // Directory.Delete(this.path + @"Users\" + login);
+            Directory.Delete(Paths.pathToUsers + login, true);
 
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("\nПользователь успешно удалён!"); Console.ResetColor();
             Console.Write("Для продолжения нажмите любую кнопку.."); Console.ReadKey();
@@ -61,14 +65,14 @@ namespace EXQuiz
 
         public void CreateQuiz()
         {
-            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[СОЗДАНИЕ ВИКТОРИНЫ]"); Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[СОЗДАНИЕ ВИКТОРИНЫ]\n"); Console.ResetColor();
 
             Console.Write("Введите название новой викторины: "); string quizName = Console.ReadLine();
-            while (File.Exists(this.path + @"Quizzes\" + quizName + ".txt"))
+            while (Is.QuizExist(quizName))
             {
                 Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённое название уже занято, попробуйте ещё раз: "); Console.ResetColor(); quizName = Console.ReadLine();
             }
-            StreamWriter streamWriter = new StreamWriter(this.path + @"Quizzes\" + quizName + ".txt");
+            StreamWriter streamWriter = new StreamWriter(Paths.pathToQuizzes + quizName + ".txt"); // открытие потока
             streamWriter.WriteLine(quizName);
 
             Console.Write("Введите описание новой викторины: "); string quizDescription = Console.ReadLine();
@@ -94,7 +98,7 @@ namespace EXQuiz
                 {
                     Console.Write("Вопрос некорректен, попробуйте ещё раз: "); Console.ResetColor(); answer = Console.ReadLine();
                 }
-                streamWriter.Write(answer); if (i < 5) { streamWriter.WriteLine(); } // чтобы лишний перенос строки не добавился на последнем ответе
+                streamWriter.Write(answer); if (i < 5) { streamWriter.WriteLine(); } // условие - чтобы лишний перенос строки не добавился на последнем ответе
             }
 
             streamWriter.Close();
@@ -110,15 +114,27 @@ namespace EXQuiz
 
         public void DeleteQuiz()
         {
-            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[УДАЛЕНИЕ ВИКТОРИНЫ]"); Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("[УДАЛЕНИЕ ВИКТОРИНЫ]\n"); Console.ResetColor();
 
-            QuizMenu quizMenu = new QuizMenu(this.path + "Quizzes"); // отображение меню с викторинами
+            QuizMenu quizMenu = new QuizMenu(); // отображение меню с викторинами
+            quizMenu.DisplayMenu(ConsoleColor.Red, "УДАЛЕНИЕ ВИКТОРИНЫ");
+
             string quizName = quizMenu.GetSelectedQuiz; // получение выбранной викторины
+            if (quizName == null) { return; } // значит был нажат escape в меню
 
-            File.Delete(this.path + @"Quizzes\" + quizName + ".txt");
+            if (!Is.QuizExist(quizName))
+            {
+                File.Delete(Paths.pathToQuizzes + quizName + ".txt");
 
-            Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("\nВикторина успешно удалена!"); Console.ResetColor();
-            Console.Write("Для продолжения нажмите любую кнопку.."); Console.ReadKey();
+                Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("\nВикторина успешно удалена!"); Console.ResetColor();
+                Console.Write("Для продолжения нажмите любую кнопку.."); Console.ReadKey();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("\nОшибка, викторина не была удалена!"); Console.ResetColor();
+                Console.Write("Для продолжения нажмите любую кнопку.."); Console.ReadKey();
+            }
+
         }
     }
 }
