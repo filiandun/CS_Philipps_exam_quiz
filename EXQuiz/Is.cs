@@ -16,7 +16,7 @@ namespace EXQuiz
                 return false;
             }
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(Paths.pathToUsers); // открытие директории Users
+            DirectoryInfo directoryInfo = new DirectoryInfo(PATHTO.USERS); // открытие директории Users
 
             foreach (DirectoryInfo directory in directoryInfo.GetDirectories()) // получение каждой папки оттуда
             {
@@ -29,6 +29,28 @@ namespace EXQuiz
             return false;
         }
 
+
+        public static bool LoginCorrect(string login)
+        {
+            if (LoginExist(login))
+            {
+                return false;
+            }
+
+            if (login == null)
+            {
+                return false;
+            }
+
+            if (login == "admin")
+            {
+                return false;
+            }
+
+            return Regex.IsMatch(login, @"^[a-zA-Z0-9]{4,16}$");
+        }
+
+
         public static bool PasswordCorrect(string login, string password)
         {
             if (password == null)
@@ -36,7 +58,7 @@ namespace EXQuiz
                 return false;
             }
 
-            using (StreamReader streamReader = new StreamReader(Paths.pathToUsers + login + @"\" + login + ".txt"))
+            using (StreamReader streamReader = new StreamReader(PATHTO.USERS + login + @"\" + login + ".txt"))
             {
                 streamReader.ReadLine(); // считывание в пустоту
                 if (password == streamReader.ReadLine())
@@ -61,9 +83,24 @@ namespace EXQuiz
             return true;
         }
 
+        public static bool PasswordSimple(string newPassword, string oldPassword)
+        {
+            if (newPassword == oldPassword)
+            {
+                return true;
+            }
+
+            if (newPassword == null)
+            {
+                return true;
+            }
+
+            return !Regex.IsMatch(newPassword, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$");
+        }
+
         public static bool QuizExist(string quizName)
         {
-            return File.Exists(Paths.pathToQuizzes + quizName + ".txt");
+            return File.Exists(PATHTO.QUIZZES + quizName + ".txt");
         }
     }
 }

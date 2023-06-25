@@ -12,10 +12,10 @@ namespace EXQuiz
     {
         public static void WriteToFile(User user)
         {
-            Directory.CreateDirectory(Paths.pathToUsers + user.login); // создание директории с пользователем
-            Directory.CreateDirectory(Paths.pathToUsers + user.login + @"\QuizzesResults"); // создание директории с результатами тестов
+            Directory.CreateDirectory(PATHTO.USERS + user.login); // создание директории с пользователем
+            Directory.CreateDirectory(PATHTO.USERS + user.login + @"\QuizzesResults"); // создание директории с результатами тестов
 
-            using (StreamWriter streamWriter = new StreamWriter(Paths.pathToUsers + user.login + @"\" + user.login + ".txt")) // открытие потока для записи
+            using (StreamWriter streamWriter = new StreamWriter(PATHTO.USERS + user.login + @"\" + user.login + ".txt")) // открытие потока для записи
             {
                 streamWriter.WriteLine(user.login); // запись логина
                 streamWriter.Write(user.password); // запись пароля
@@ -31,7 +31,7 @@ namespace EXQuiz
 
         public static User ReadFromFile(string login)
         {
-            string pathToUser = Paths.pathToUsers + login + @"\" + login + ".txt";
+            string pathToUser = PATHTO.USERS + login + @"\" + login + ".txt";
             using (StreamReader streamReader = new StreamReader(pathToUser)) // открытие потока для чтения
             {
                 streamReader.ReadLine(); // считывание в пустоту

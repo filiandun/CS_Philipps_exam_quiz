@@ -32,8 +32,8 @@ namespace EXQuiz
                 return;
             }
 
-            StreamReader streamReader = new StreamReader(Paths.pathToQuizzes + quizName + ".txt");
-            StreamWriter streamWriter = new StreamWriter(Paths.pathToUsers + this.login + @"\QuizzesResults\" + quizName + " " + DateTime.Now.Hour + "-" + DateTime.Now.Minute + "-" + DateTime.Now.Second + " " + DateTime.Now.Year + "-" + DateTime.Now.Month + "-" + DateTime.Now.Day + ".txt"); // создание файла с результатами
+            StreamReader streamReader = new StreamReader(PATHTO.QUIZZES + quizName + ".txt");
+            StreamWriter streamWriter = new StreamWriter(PATHTO.USERS + this.login + @"\QuizzesResults\" + quizName + " " + DateTime.Now.Hour + "-" + DateTime.Now.Minute + "-" + DateTime.Now.Second + " " + DateTime.Now.Year + "-" + DateTime.Now.Month + "-" + DateTime.Now.Day + ".txt"); // создание файла с результатами
             streamWriter.WriteLine(quizName + "\n");
 
             Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[{quizName}]"); Console.ResetColor();
@@ -88,14 +88,14 @@ namespace EXQuiz
 
         public void ShowQuizzesResult()
         {
-            ResultMenu resultMenu = new ResultMenu(Paths.pathToUsers + this.login + @"\QuizzesResults\"); // отображение меню с результатами викторин
+            ResultMenu resultMenu = new ResultMenu(PATHTO.USERS + this.login + @"\QuizzesResults\"); // отображение меню с результатами викторин
             string resultName = resultMenu.GetSelectedResult; // получение выбранного результата
             if (resultName == null)
             {
                 return;
             }
 
-            StreamReader streamReader = new StreamReader(Paths.pathToUsers + this.login + @"\QuizzesResults\" + resultName + ".txt");
+            StreamReader streamReader = new StreamReader(PATHTO.USERS + this.login + @"\QuizzesResults\" + resultName + ".txt");
 
             Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[{resultName}]"); Console.ResetColor();
 
@@ -117,12 +117,11 @@ namespace EXQuiz
         {
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ИЗМЕНЕНИЕ ИМЕНИ]\n"); Console.ResetColor();
 
-            Console.WriteLine($"Ваше текущее имя: {this.birthDay}");
+            Console.WriteLine($"Ваше текущее имя: {this.name}");
             Console.Write("Введите новое имя: "); string newName = Console.ReadLine().Trim();
 
-            while (true)
+            while (newName == null)
             {
-                break;
                 Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённое имя некорректно, попробуйте ещё раз: "); Console.ResetColor(); newName = Console.ReadLine().Trim();
             }
             this.name = newName;
@@ -140,9 +139,9 @@ namespace EXQuiz
             Console.WriteLine($"Ваш текущий пароль: {this.password}");
             Console.Write("Введите новый пароль: "); string newPassword = Console.ReadLine().Trim();
 
-            while (Is.PasswordSimple(newPassword))
+            while (Is.PasswordSimple(newPassword, this.password))
             {
-                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый пароль должен содержать хотя бы одну прописную букву, строчную букву и цифру, попробуйте ещё раз: "); Console.ResetColor(); newPassword = Console.ReadLine().Trim();
+                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый пароль равен старому или слишком простой: должен содержать хотя бы одну прописную букву, строчную букву и цифру, попробуйте ещё раз: "); Console.ResetColor(); newPassword = Console.ReadLine().Trim();
             }
             this.password = newPassword;
 
@@ -157,11 +156,11 @@ namespace EXQuiz
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[ИЗМЕНЕНИЕ ДАТЫ РОЖДЕНИЯ]\n"); Console.ResetColor();
 
             Console.WriteLine($"Ваша текущая дата рождения: {this.birthDay}");
-            Console.Write("Введите новую дату рождения в формате 30.04.2023: "); string input = Console.ReadLine(); DateOnly birthDay;
+            Console.Write("Введите новую дату рождения в формате 30.04.2023: "); string input = Console.ReadLine().Trim(); DateOnly birthDay;
 
             while (!DateOnly.TryParseExact(input, "dd.MM.yyyy", out birthDay))
             {
-                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённая дата некорректна, попробуйте ещё раз: "); Console.ResetColor(); input = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённая дата некорректна, попробуйте ещё раз: "); Console.ResetColor(); input = Console.ReadLine().Trim();
             }
             this.birthDay = birthDay;
 

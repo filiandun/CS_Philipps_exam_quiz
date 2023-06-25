@@ -8,41 +8,49 @@ namespace EXQuiz
 
         public Quiz()
         {
-            if (!Directory.Exists(Paths.pathToSDMQ)) // если пути не существует (т.е. программа в первый раз открывается)
+            if (!Directory.Exists(PATHTO.SDMQ)) // если пути не существует (т.е. программа в первый раз открывается)
             {
-                Directory.CreateDirectory(Paths.pathToSDMQ); // создание основной директории
-                Directory.CreateDirectory(Paths.pathToTOP); // создание директории с ТОПом
-                Directory.CreateDirectory(Paths.pathToQuizzes); // создание директории с викторинами
-                Directory.CreateDirectory(Paths.pathToUsers); // создание директории с пользователями
+                Directory.CreateDirectory(PATHTO.SDMQ); // создание основной директории
+                Directory.CreateDirectory(PATHTO.TOP); // создание директории с ТОПом
+                Directory.CreateDirectory(PATHTO.QUIZZES); // создание директории с викторинами
+                Directory.CreateDirectory(PATHTO.USERS); // создание директории с пользователями
 
                 Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("ЗДРАВСТВУЙТЕ, ВЫ БЕРЁТЕ НА СЕБЯ РОЛЬ АДМИНИСТРАТОРА"); Console.ResetColor();
                 Console.WriteLine("Ваш логин задан автоматически: admin");
                 Console.Write("Придумайте ваш пароль: "); string password = Console.ReadLine().Trim();
+                while (Is.PasswordSimple(password))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый пароль должен содержать хотя бы одну прописную букву, строчную букву и цифру, попробуйте ещё раз: "); Console.ResetColor(); password = Console.ReadLine().Trim();
+                }
 
                 StreamWriterReader.WriteToFile(new Admin("admin", password));
             }
             else // на всякий случай, вдруг какой-то умник решит удалить всё
             {
-                if (!Directory.Exists(Paths.pathToTOP))
+                if (!Directory.Exists(PATHTO.TOP))
                 {
-                    Directory.CreateDirectory(Paths.pathToTOP); // создание директории с ТОПом
+                    Directory.CreateDirectory(PATHTO.TOP); // создание директории с ТОПом
                 }
 
-                if (!Directory.Exists(Paths.pathToQuizzes)) 
+                if (!Directory.Exists(PATHTO.QUIZZES)) 
                 {
-                    Directory.CreateDirectory(Paths.pathToQuizzes); // создание директории с викторинами
+                    Directory.CreateDirectory(PATHTO.QUIZZES); // создание директории с викторинами
                 }
 
-                if (!Directory.Exists(Paths.pathToUsers))
+                if (!Directory.Exists(PATHTO.USERS))
                 {
-                    Directory.CreateDirectory(Paths.pathToUsers); // создание директории с пользователями
+                    Directory.CreateDirectory(PATHTO.USERS); // создание директории с пользователями
                 }
 
-                if (!Directory.Exists(Paths.pathToUsers + "admin") || !File.Exists(Paths.pathToUsers + @"admin\admin.txt") || new FileInfo(Paths.pathToUsers + @"admin\admin.txt").Length == 0)
+                if (!Directory.Exists(PATHTO.USERS + "admin") || !File.Exists(PATHTO.USERS + @"admin\admin.txt") || new FileInfo(PATHTO.USERS + @"admin\admin.txt").Length == 0)
                 {
                     Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("ЗДРАВСТВУЙТЕ, ВЫ БЕРЁТЕ НА СЕБЯ РОЛЬ АДМИНИСТРАТОРА"); Console.ResetColor();
                     Console.WriteLine("Ваш логин задан автоматически: admin");
                     Console.Write("Придумайте ваш пароль: "); string password = Console.ReadLine().Trim();
+                    while (Is.PasswordSimple(password))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый пароль должен содержать хотя бы одну прописную букву, строчную букву и цифру, попробуйте ещё раз: "); Console.ResetColor(); password = Console.ReadLine().Trim();
+                    }
 
                     StreamWriterReader.WriteToFile(new Admin("admin", password));
                 }
@@ -74,7 +82,7 @@ namespace EXQuiz
             Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("[РЕГИСТРАЦИЯ НОВОГО АККАУНТА]"); Console.ResetColor();
 
             Console.Write("\nПридумайте ваш логин: "); string login = Console.ReadLine().Trim();
-            while (Is.LoginExist(login) || login == "admin")
+            while (!Is.LoginCorrect(login))
             {
                 Console.ForegroundColor = ConsoleColor.Red; Console.Write("Введённый логин уже занят, попробуйте ещё раз: "); Console.ResetColor(); login = Console.ReadLine().Trim();
             }
@@ -168,12 +176,9 @@ namespace EXQuiz
             quizMenu.DisplayMenu(ConsoleColor.Green, "ТОП УЧАСТНИКОВ ПО КОНКРЕТНОЙ ВИКТОРИНЕ");
 
             string quizName = quizMenu.GetSelectedQuiz; // получение выбранной викторины
-            if (quizName == null)
-            {
-                return;
-            }
+            if (quizName == null) { return; } // костыль: если было возвращено null, значит пользователь нажал ESCAPE
             
-            using StreamReader streamReader = new StreamReader(Paths.pathToTOP + $"TOP {quizName.ToUpper()}.txt");
+            using StreamReader streamReader = new StreamReader(PATHTO.TOP + $"TOP {quizName.ToUpper()}.txt");
 
             Console.Clear(); Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine($"[{streamReader.ReadLine()}]\n"); Console.ResetColor();
             streamReader.ReadLine(); // считывание в пустоту
@@ -195,7 +200,7 @@ namespace EXQuiz
         {
             Dictionary<string, int> dictionaryWithUsersResults = new Dictionary<string, int>();
 
-            DirectoryInfo directoryWithUsers = new DirectoryInfo(Paths.pathToUsers); // открытие директории Users
+            DirectoryInfo directoryWithUsers = new DirectoryInfo(PATHTO.USERS); // открытие директории Users
 
             foreach (DirectoryInfo directoryWithUser in directoryWithUsers.GetDirectories()) // взятие папки каждого пользователя
             {
@@ -230,7 +235,7 @@ namespace EXQuiz
                 }
             }
 
-            using StreamWriter streamWriter = new StreamWriter(Paths.pathToTOP + $"TOP {quizName.ToUpper()}.txt");
+            using StreamWriter streamWriter = new StreamWriter(PATHTO.TOP + $"TOP {quizName.ToUpper()}.txt");
             streamWriter.WriteLine($"ТОП ПО ВИКТОРИНЕ {quizName.ToUpper()}\n");
 
             List<KeyValuePair<string, int>> listyWithUsersResults = dictionaryWithUsersResults.OrderByDescending(x => x.Value).ToList();

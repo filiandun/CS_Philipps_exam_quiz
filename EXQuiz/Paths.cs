@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace EXQuiz
 {
-    internal static class Paths
+    internal static class PATHTO
     {
-        public static string pathToSDMQ = @"C:\SDMQuiz\";
-        public static string pathToTOP = @"C:\SDMQuiz\TOP\";
-        public static string pathToQuizzes = @"C:\SDMQuiz\Quizzes\";
-        public static string pathToUsers = @"C:\SDMQuiz\Users\";
-
+        public const string SDMQ = @"C:\SDMQuiz\";
+        public const string TOP = @"C:\SDMQuiz\TOP\";
+        public const string QUIZZES = @"C:\SDMQuiz\Quizzes\";
+        public const string USERS = @"C:\SDMQuiz\Users\";
     }
 }

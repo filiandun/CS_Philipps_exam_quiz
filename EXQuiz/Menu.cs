@@ -191,7 +191,7 @@ namespace EXQuiz
 
             this.quizzesDictionary = new Dictionary<string, string>(); // инициализация словаря, где будет хранится имя и описание каждой викторины
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(Paths.pathToQuizzes); // открытие директории с викторинами
+            DirectoryInfo directoryInfo = new DirectoryInfo(PATHTO.QUIZZES); // открытие директории с викторинами
             foreach (FileInfo file in directoryInfo.GetFiles()) // получение каждого файла оттуда
             {
                 streamReader = new StreamReader(file.FullName);
